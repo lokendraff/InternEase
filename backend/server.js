@@ -1,5 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
+// Load env vars
+dotenv.config();
 const cors = require('cors');
 const connectDB = require('./config/db.js');
 
@@ -9,8 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const opportunityRoutes = require('./routes/opportunityRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');    
 
-// Load env vars
-dotenv.config();
+
 
 // Connect to Database
 connectDB();

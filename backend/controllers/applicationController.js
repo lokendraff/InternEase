@@ -1,5 +1,6 @@
 const Application = require('../models/Application');
 const Opportunity = require('../models/Opportunity');
+const { analyzeResume } = require('../utils/gemini');
 
 /**
  * @desc    Apply for an opportunity (Internship/Event)
@@ -9,7 +10,11 @@ const Opportunity = require('../models/Opportunity');
 
 const applyForOpportunity = async (req, res) => {
     try {
-        const { opportunityId } = req.body;
+        const { opportunityId, resumeText } = req.body;
+
+        if (!resumeText) {
+            return res.status(400).json({ message: 'Resume text is required for AI analysis' });
+        }
 
         // Verify if the opportunity exists and is open
         const opportunity = await Opportunity.findById(opportunityId);
@@ -27,16 +32,16 @@ const applyForOpportunity = async (req, res) => {
             return res.status(400).json({ message: 'You have already applied for this opportunity' });
         }
 
-        // TODO: (Phase 3) Call Gemini API here to analyze Student's Resume against Opportunity's skillsRequired
-        // const { atsScore, feedback } = await getGeminiAtsScore(resumeText, opportunity.skillsRequired);
+        // Analyze resume using Gemini
+        const { atsScore, feedback } = await analyzeResume(resumeText, opportunity.skillsRequired);
         
         // Create the application card (starts in 'Applied' column)
         const application = await Application.create({
             studentId: req.user._id,
             opportunityId,
             status: 'Applied',
-            // atsScore: atsScore,  // Will be populated by Gemini later
-            // aiFeedback: feedback // Will be populated by Gemini later
+            atsScore: atsScore,  
+            aiFeedback: feedback 
         });
 
         res.status(201).json(application);
