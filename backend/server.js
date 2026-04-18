@@ -2,8 +2,12 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db.js');
+
+
+// Import Routes
 const authRoutes = require('./routes/authRoutes');
 const opportunityRoutes = require('./routes/opportunityRoutes');
+const applicationRoutes = require('./routes/applicationRoutes');    
 
 // Load env vars
 dotenv.config();
@@ -20,6 +24,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/opportunities', opportunityRoutes);
+app.use('/api/applications', applicationRoutes);
 // Test Route
 app.get('/', (req, res) => {
     res.send('InternEase API is running...');
