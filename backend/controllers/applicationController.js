@@ -1,6 +1,7 @@
 const Application = require('../models/Application');
 const Opportunity = require('../models/Opportunity');
-const { analyzeResume } = require('../utils/gemini');
+const { analyzeResume } = require('../utils/gemini'); 
+const { awardXPAndBadges } = require('../utils/gamification');
 
 /**
  * @desc    Apply for an opportunity (Internship/Event)
@@ -44,7 +45,13 @@ const applyForOpportunity = async (req, res) => {
             aiFeedback: feedback 
         });
 
-        res.status(201).json(application);
+        // Award XP for applying (e.g., 10 XP)
+        const gamificationUpdate = await awardXPAndBadges(req.user._id, 50);
+
+        res.status(201).json({
+            application, 
+            gamification: gamificationUpdate
+            });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

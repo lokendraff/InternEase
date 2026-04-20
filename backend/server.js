@@ -10,7 +10,7 @@ const connectDB = require('./config/db.js');
 const authRoutes = require('./routes/authRoutes');
 const opportunityRoutes = require('./routes/opportunityRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');    
-
+const userRoutes = require('./routes/userRoutes');
 
 
 // Connect to Database
@@ -26,6 +26,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/opportunities', opportunityRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/users', userRoutes);
 // Test Route
 app.get('/', (req, res) => {
     res.send('InternEase API is running...');
