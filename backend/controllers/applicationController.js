@@ -2,6 +2,7 @@ const Application = require('../models/Application');
 const Opportunity = require('../models/Opportunity');
 const { analyzeResume } = require('../utils/gemini'); 
 const { awardXPAndBadges } = require('../utils/gamification');
+const { triggerRealtimeNotification } = require('../utils/supabase');
 
 /**
  * @desc    Apply for an opportunity (Internship/Event)
@@ -98,13 +99,22 @@ const updateApplicationStatus = async (req, res) => {
             id,
             { status },
             { new: true }
-        );
+        ).populate('opportunityId', 'title');
 
         if (!updatedApplication) {
             return res.status(404).json({ message: 'Application not found' });
         }
 
-        // TODO: (Phase 4) Trigger Supabase Realtime Event here to notify the student instantly
+        // Trigger Supabase Realtime Event here to notify the student instantly
+        const channelName = `student-${updatedApplication.studentId}`;
+        const payload = {
+            applicationId: updatedApplication._id,
+            opportunityTitle: updatedApplication.opportunityId.title,
+            newStatus: updatedApplication.status,
+            message: `Congratulations/Update! Your application for ${updatedApplication.opportunityId.title} is now: ${updatedApplication.status}`
+        };
+
+        triggerRealtimeNotification(channelName, 'application_status_changed', payload);
 
         res.status(200).json(updatedApplication);
     } catch (error) {
