@@ -20,6 +20,20 @@ const userSchema = new mongoose.Schema({
     gamification: {
         xp: { type: Number, default: 0 },
         badges: [{ type: String }]
+    },
+    codingProfiles: {
+        leetcodeHandle: { type: String, default: "" },
+        codeforcesHandle: { type: String, default: "" },
+        stats: {
+            leetcode: {
+                totalSolved: { type: Number, default: 0 },
+                ranking: { type: Number, default: 0 }
+            },
+            codeforces: {
+                rating: { type: Number, default: 0 },
+                rank: { type: String, default: "unranked" }
+            }
+        }
     }
 }, { timestamps: true });
 
