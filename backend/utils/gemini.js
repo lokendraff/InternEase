@@ -1,18 +1,10 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-// Initialize Gemini API with your secret key
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-/**
- * Analyzes a resume against required skills and returns an ATS score and feedback.
- * @param {string} resumeText - The parsed text from the student's resume.
- * @param {Array} skillsRequired - Array of skills required for the internship.
- * @returns {Object} { atsScore: Number, feedback: String }
- */
 const analyzeResume = async (resumeText, skillsRequired) => {
     try {
-        // Using the fast flash model for quick API responses
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });   
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         const prompt = `
             You are an expert HR ATS (Applicant Tracking System).
             Analyze the following resume text against the required skills for an internship.
@@ -32,7 +24,6 @@ const analyzeResume = async (resumeText, skillsRequired) => {
         const result = await model.generateContent(prompt);
         let responseText = result.response.text();
 
-        // Clean up markdown formatting if Gemini adds it accidentally
         responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
 
         const parsedData = JSON.parse(responseText);
@@ -42,9 +33,51 @@ const analyzeResume = async (resumeText, skillsRequired) => {
         };
     } catch (error) {
         console.error('Gemini API Error:', error.message);
-        // Fallback response so the application process doesn't crash completely
         return { atsScore: 0, feedback: "AI Analysis failed temporarily." };
+    }   
+};
+
+const generateInterviewQuestions = async (jobDescription) => {
+    try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }); // FIXED HERE
+        const prompt = `
+            Act as a Senior Technical Interviewer. Based on this Job Description: "${jobDescription}", 
+            generate 5 relevant technical interview questions for a candidate.
+            Return ONLY a JSON array of strings. No extra text.
+        `;
+
+        const result = await model.generateContent(prompt);
+        let responseText = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(responseText);
+    } catch (error) {
+        console.error("Gemini Interview Error:", error);
+        return ["Describe your technical stack.", "How do you handle complex bugs?", "Explain a project you're proud of."];
     }
 };
 
-module.exports = { analyzeResume };
+const evaluateInterviewAnswers = async (qnaArray) => {
+    try {
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+        const prompt = `
+            Act as a strict but fair Technical Interviewer. 
+            Evaluate the following Questions and the Candidate's Answers:
+            ${JSON.stringify(qnaArray)}
+            
+            Provide the output STRICTLY as a JSON object with two keys:
+            1. "overallScore": A number from 0 to 100 rating their overall performance.
+            2. "feedbackArray": An array of strings, where each string is a 1-sentence feedback for the corresponding answer (pointing out what was good or missing).
+            
+            Return ONLY the JSON object, no markdown tags.
+        `;
+
+        const result = await model.generateContent(prompt);
+        let responseText = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(responseText);
+    } catch (error) {
+        console.error("Gemini Evaluation Error:", error);
+        return { overallScore: 0, feedbackArray: qnaArray.map(() => "Evaluation failed temporarily.") };
+    }
+};
+
+module.exports = { analyzeResume, generateInterviewQuestions, evaluateInterviewAnswers };
