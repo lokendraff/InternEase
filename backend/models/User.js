@@ -11,6 +11,10 @@ const userSchema = new mongoose.Schema({
         enum: ['Student', 'Organizer', 'Admin'], 
         default: 'Student' 
     },
+
+    isVerified: { type: Boolean, default: false },
+    otp: { type: String },
+    otpExpires: { type: Date },
     
     //gamification for students only
     gamification: {
