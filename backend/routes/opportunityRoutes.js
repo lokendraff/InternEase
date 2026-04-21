@@ -1,13 +1,22 @@
 const express = require('express');
-const { createOpportunity, getOpportunities } = require('../controllers/opportunityController');
 const { protect, authorizeRoles } = require('../middlewares/authMiddleware');
+const {
+    createOpportunity,
+    getAllOpportunities, // <-- Sahi naam 
+    getOpportunityById,
+    getLiveExternalJobs
+} = require('../controllers/opportunityController');
 
 const router = express.Router();
 
-// Public/Student route
-router.get('/', getOpportunities);
+// 1. Static Custom Routes (Hamesha Upar)
+router.get('/live', getLiveExternalJobs);
 
-// Protected route: Only logged-in users with 'Organizer' role can post
+// 2. Base Routes
+router.get('/', getAllOpportunities); // <-- Yahan naam fix kiya
 router.post('/', protect, authorizeRoles('Organizer'), createOpportunity);
+
+// 3. Dynamic Routes (Hamesha Niche)
+router.get('/:id', getOpportunityById);
 
 module.exports = router;
