@@ -83,9 +83,24 @@ const getOpportunityById = async (req, res) => {
     }
 };
 
+/**
+ * @desc    Get all opportunities created by the logged-in Organizer
+ * @route   GET /api/opportunities/organizer
+ * @access  Private (Organizer only)
+ */
+const getOrganizerOpportunities = async (req, res) => {
+    try {
+        const opportunities = await Opportunity.find({ organizerId: req.user._id }).sort({ createdAt: -1 });
+        res.status(200).json(opportunities);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = { 
     createOpportunity, 
     getAllOpportunities, 
     getOpportunityById, 
-    getLiveExternalJobs
+    getLiveExternalJobs,
+    getOrganizerOpportunities
 };

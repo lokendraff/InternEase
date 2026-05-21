@@ -4,10 +4,11 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, Mic, Briefcase, Trophy, LogOut,
   ChevronRight, ChevronLeft, Star, TrendingUp, Code2, Upload, Play,
-  Globe, Building2, Clock, ExternalLink, Menu, X, Users, Zap,
+  Globe, Building2, Clock, ExternalLink, Menu, X, Users, Zap, Settings,
 } from 'lucide-react';
 import API from '../utils/axios';
 import toast from 'react-hot-toast';
+import ProfileSettingsModal from '../components/ProfileSettingsModal';
 
 const fadeUp = (d = 0) => ({
   initial: { opacity: 0, y: 24, filter: 'blur(4px)' },
@@ -20,11 +21,12 @@ const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { id: 'resume', label: 'AI Resume', icon: FileText, path: '/resume-analyzer' },
   { id: 'interview', label: 'Mock Interviews', icon: Mic, path: '/mock-interview' },
-  { id: 'jobs', label: 'Live Jobs', icon: Briefcase, path: '/dashboard' },
+  { id: 'jobs', label: 'Live Jobs', icon: Briefcase, path: '/opportunities' },
+  { id: 'applications', label: 'My Applications', icon: FileText, path: '/applications' },
   { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, path: '/leaderboard' },
 ];
 
-function Sidebar({ collapsed, toggle, user, onLogout }) {
+function Sidebar({ collapsed, toggle, user, onLogout, onSettings }) {
   const location = useLocation();
   const init = user?.name?.charAt(0)?.toUpperCase() || '?';
   return (
@@ -63,9 +65,14 @@ function Sidebar({ collapsed, toggle, user, onLogout }) {
             style={{ background: 'linear-gradient(135deg, #F59E0B, #FBBF24)', boxShadow: '0 0 12px rgba(251,191,36,0.4)' }}>{init}</div>
           {!collapsed && <div className="min-w-0"><p className="text-sm font-semibold text-amber-50 truncate">{user?.name}</p><p className="text-xs text-gray-500 capitalize">{user?.role}</p></div>}
         </div>
-        <button onClick={onLogout} className={`w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium text-gray-500 hover:text-red-400 hover:bg-red-500/[0.07] transition-all ${collapsed ? 'justify-center' : ''}`}>
-          <LogOut size={15} />{!collapsed && <span>Logout</span>}
-        </button>
+        <div className={`flex items-center gap-2 ${collapsed ? 'flex-col' : ''}`}>
+          <button onClick={onSettings} className={`flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium text-gray-400 hover:text-amber-400 hover:bg-amber-500/[0.07] transition-all ${collapsed ? 'justify-center w-full' : 'justify-center'}`}>
+            <Settings size={15} />{!collapsed && <span>Settings</span>}
+          </button>
+          <button onClick={onLogout} className={`flex-1 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium text-gray-500 hover:text-red-400 hover:bg-red-500/[0.07] transition-all ${collapsed ? 'justify-center w-full' : 'justify-center'}`}>
+            <LogOut size={15} />{!collapsed && <span>Logout</span>}
+          </button>
+        </div>
       </div>
     </motion.aside>
   );
@@ -207,6 +214,7 @@ function Spinner() {
 export default function StudentDashboard() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [profile, setProfile] = useState(null);
   const [jobs, setJobs] = useState([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -216,11 +224,15 @@ export default function StudentDashboard() {
   const stored = localStorage.getItem('user');
   const cachedUser = stored ? JSON.parse(stored) : { name: 'Student', role: 'Student' };
 
-  useEffect(() => {
+  const fetchProfile = () => {
     API.get('/api/users/profile')
       .then(r => setProfile(r.data))
       .catch(() => toast.error('Failed to load profile'))
       .finally(() => setLoadingProfile(false));
+  };
+
+  useEffect(() => {
+    fetchProfile();
 
     API.get('/api/opportunities/live')
       .then(r => { if (Array.isArray(r.data)) setJobs(r.data); })
@@ -231,8 +243,8 @@ export default function StudentDashboard() {
   const user = profile || cachedUser;
   const lc = profile?.liveStats?.leetcode || {};
   const cf = profile?.liveStats?.codeforces || {};
-  const xp = profile?.xp ?? 0;
-  const badges = profile?.badges || [];
+  const xp = profile?.gamification?.xp ?? 0;
+  const badges = profile?.gamification?.badges || [];
 
   const logout = () => { localStorage.removeItem('token'); localStorage.removeItem('user'); navigate('/login'); };
 
@@ -241,15 +253,23 @@ export default function StudentDashboard() {
       {/* Mobile overlay */}
       {mobileOpen && <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={() => setMobileOpen(false)} />}
 
+      {/* Profile Settings Modal */}
+      <ProfileSettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        user={user} 
+        onUpdate={fetchProfile} 
+      />
+
       {/* Desktop sidebar */}
       <div className="hidden lg:flex">
-        <Sidebar collapsed={collapsed} toggle={() => setCollapsed(c => !c)} user={user} onLogout={logout} />
+        <Sidebar collapsed={collapsed} toggle={() => setCollapsed(c => !c)} user={user} onLogout={logout} onSettings={() => setIsSettingsOpen(true)} />
       </div>
 
       {/* Mobile sidebar */}
       {mobileOpen && (
         <div className="fixed left-0 top-0 h-full z-50 lg:hidden">
-          <Sidebar collapsed={false} toggle={() => {}} user={user} onLogout={logout} />
+          <Sidebar collapsed={false} toggle={() => {}} user={user} onLogout={logout} onSettings={() => { setIsSettingsOpen(true); setMobileOpen(false); }} />
           <button className="absolute top-5 right-[-48px] w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white" onClick={() => setMobileOpen(false)}><X size={16} /></button>
         </div>
       )}
@@ -311,7 +331,7 @@ export default function StudentDashboard() {
               <section>
                 <motion.div {...fadeUp(0.35)} className="flex items-center justify-between mb-6">
                   <p className="text-xs text-gray-600 uppercase tracking-widest font-semibold">Live Opportunities</p>
-                  <button className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors font-medium">View all <ChevronRight size={13} /></button>
+                  <Link to="/opportunities" className="flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 transition-colors font-medium">View all <ChevronRight size={13} /></Link>
                 </motion.div>
                 {loadingJobs ? <Spinner /> : jobs.length === 0 ? (
                   <div className="text-center py-16 text-gray-600">

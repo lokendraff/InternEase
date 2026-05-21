@@ -8,7 +8,7 @@ let supabase = null;
 // Initialize only if keys are present (prevents server crash if .env is missing)
 if (supabaseUrl && supabaseKey) {
     supabase = createClient(supabaseUrl, supabaseKey);
-    console.log("Supabase Client Initialized");
+    // console.log("Supabase Client Initialized");
 } else {
     console.warn("Supabase keys missing in .env. Realtime features will be disabled.");
 }
@@ -29,7 +29,7 @@ const triggerRealtimeNotification = (channelName, eventName, payload) => {
         payload: payload
     });
 
-    console.log(`⚡ Realtime Event '${eventName}' fired to channel '${channelName}'`);
+    // console.log(`⚡ Realtime Event '${eventName}' fired to channel '${channelName}'`);
 };
 
 module.exports = { triggerRealtimeNotification };

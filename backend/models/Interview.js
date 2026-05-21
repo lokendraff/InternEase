@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 
 const interviewSchema = new mongoose.Schema({
-    applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true },
+    applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application' },
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    jobDescription: { type: String },
+    interviewType: { type: String, enum: ['technical', 'behavioral'], default: 'technical' },
     questions: [{
         questionText: String,
         answerText: { type: String, default: "" }, // Student's response

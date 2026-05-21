@@ -95,7 +95,12 @@ export default function LoginPage() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data));
       toast.success(`Welcome back, ${data.name}! ⚡`);
-      navigate('/dashboard');
+      
+      if (data.role === 'Organizer') {
+        navigate('/organizer-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Invalid email or password');
     } finally {
@@ -147,11 +152,11 @@ export default function LoginPage() {
                 value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
             </motion.div>
 
-            <motion.div {...fadeUp(0.32)} className="flex justify-end">
+            {/* <motion.div {...fadeUp(0.32)} className="flex justify-end">
               <Link to="/forgot-password" className="text-sm text-gray-500 hover:text-gold-bright transition-colors">
                 Forgot password?
               </Link>
-            </motion.div>
+            </motion.div> */}
 
             <motion.div {...fadeUp(0.38)} className="pt-2">
               <button id="login-submit" type="submit" disabled={loading}

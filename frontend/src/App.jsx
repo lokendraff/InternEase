@@ -8,6 +8,10 @@ import ResumeAnalyzer from './pages/ResumeAnalyzer';
 import MockInterview from './pages/MockInterview';
 import Leaderboard from './pages/Leaderboard';
 
+import Opportunities from './pages/Opportunities';
+import MyApplications from './pages/MyApplications';
+import OrganizerDashboard from './pages/OrganizerDashboard';
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -25,9 +29,12 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/dashboard" element={<StudentDashboard />} />
+        <Route path="/organizer-dashboard" element={<OrganizerDashboard />} />
         <Route path="/resume-analyzer" element={<ResumeAnalyzer />} />
         <Route path="/mock-interview" element={<MockInterview />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
+        <Route path="/opportunities" element={<Opportunities />} />
+        <Route path="/applications" element={<MyApplications />} />
       </Routes>
     </BrowserRouter>
   );

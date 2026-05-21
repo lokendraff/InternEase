@@ -82,4 +82,89 @@ const submitAndEvaluateInterview = async (req, res) => {
     }
 };
 
-module.exports = { startMockInterview, submitAndEvaluateInterview };
+/**
+ * @desc    Start a JD-based mock interview (no applicationId needed)
+ * @route   POST /api/interviews/start
+ * @access  Private (Student only)
+ */
+const startJDInterview = async (req, res) => {
+    try {
+        const { jobDescription, interviewType } = req.body;
+
+        if (!jobDescription || !jobDescription.trim()) {
+            return res.status(400).json({ message: 'Job Description is required.' });
+        }
+
+        const type = interviewType || 'technical';
+
+        // Enhance the prompt based on interview type
+        const typePrompt = type === 'behavioral'
+            ? `Focus on behavioral and situational questions (STAR method). Job Description: "${jobDescription}"`
+            : jobDescription;
+
+        // Generate AI Questions from raw JD text
+        const aiQuestions = await generateInterviewQuestions(typePrompt);
+
+        // Ensure exactly 5 questions
+        const finalQuestions = aiQuestions.slice(0, 5);
+
+        // Save to DB
+        const interview = await Interview.create({
+            studentId: req.user._id,
+            jobDescription: jobDescription.trim(),
+            interviewType: type,
+            questions: finalQuestions.map(q => ({ questionText: q })),
+        });
+
+        // Return flat question strings for the frontend
+        res.status(201).json({
+            interviewId: interview._id,
+            questions: finalQuestions,
+        });
+    } catch (error) {
+        console.error('startJDInterview Error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+/**
+ * @desc    Evaluate a JD-based interview (stateless — no DB lookup needed)
+ * @route   POST /api/interviews/evaluate
+ * @access  Private (Student only)
+ */
+const evaluateJDInterview = async (req, res) => {
+    try {
+        const { jobDescription, interviewType, qna } = req.body;
+        // qna = [{ question: "...", answer: "..." }, ...]
+
+        if (!qna || !Array.isArray(qna) || qna.length === 0) {
+            return res.status(400).json({ message: 'Q&A data is required.' });
+        }
+
+        // Format for the Gemini evaluator
+        const qnaArray = qna.map(item => ({
+            questionText: item.question,
+            answerText: item.answer || ""
+        }));
+
+        // Get AI Evaluation
+        const { overallScore, feedbackArray } = await evaluateInterviewAnswers(qnaArray);
+
+        // Build response with per-question feedback
+        const feedback = qna.map((item, i) => ({
+            question: item.question,
+            answer: item.answer || '',
+            aiFeedback: feedbackArray[i] || 'No feedback generated.',
+        }));
+
+        res.status(200).json({
+            overallScore,
+            feedback,
+        });
+    } catch (error) {
+        console.error('evaluateJDInterview Error:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { startMockInterview, submitAndEvaluateInterview, startJDInterview, evaluateJDInterview };

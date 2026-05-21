@@ -4,13 +4,15 @@ const {
     createOpportunity,
     getAllOpportunities, // <-- Sahi naam 
     getOpportunityById,
-    getLiveExternalJobs
+    getLiveExternalJobs,
+    getOrganizerOpportunities
 } = require('../controllers/opportunityController');
 
 const router = express.Router();
 
 // 1. Static Custom Routes (Hamesha Upar)
 router.get('/live', getLiveExternalJobs);
+router.get('/organizer', protect, authorizeRoles('Organizer'), getOrganizerOpportunities);
 
 // 2. Base Routes
 router.get('/', getAllOpportunities); // <-- Yahan naam fix kiya

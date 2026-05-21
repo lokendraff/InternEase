@@ -122,8 +122,25 @@ const updateApplicationStatus = async (req, res) => {
     }
 };
 
+/**
+ * @desc    Get all applications for the logged-in student
+ * @route   GET /api/applications/student
+ * @access  Private (Student only)
+ */
+const getStudentApplications = async (req, res) => {
+    try {
+        const applications = await Application.find({ studentId: req.user._id })
+            .populate('opportunityId', 'title company type location')
+            .sort({ createdAt: -1 });
+        res.status(200).json(applications);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = { 
     applyForOpportunity, 
     getApplicationsForOpportunity, 
-    updateApplicationStatus 
+    updateApplicationStatus,
+    getStudentApplications
 };

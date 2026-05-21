@@ -1,0 +1,58 @@
+🚀 The Ultimate InternEase Master Plan (Merged & Optimized)
+Phase 1: Sprint 0 – Foundation & Quick Fixes (We are here 📍)
+Goal: Fix broken wires before building new rooms.
+
+✅ Mock Interview Flow: JD textarea aur 5-question logic (Humne abhi abhi kiya).
+
+🛠️ Dashboard Data Mapping Bug: Frontend me profile.xp / profile.badges ko backend ke gamification.xp se match karwana.
+
+🛠️ Environment Variables: axios.js me hardcoded http://localhost:5000 ko hata kar .env variables lagana.
+
+🛠️ Dead Links: "Forgot Password" link ko hide karna ya uska basic UI banana.
+
+🛠️ Leaderboard Integration: Dummy data hata kar /api/users/leaderboard ko connect karna.
+
+Phase 2: Sprint 1 – Student Application Pipeline (The Core)
+Goal: Student job/event search aur apply kar sake.
+
+Opportunities Page: Internal aur Live jobs ki list dikhana.
+
+Apply Flow: /api/applications ke through apply button chalu karna.
+
+My Applications Tracker: Student ke dashboard pe ek tracker jo status (Pending, Interview, Hired) dikhaye aur AI ATS feedback store kare.
+
+Phase 3: Sprint 2 – Organizer / Recruiter Dashboard (The Flip Side)
+Goal: Recruiter job post kare aur applications manage kare.
+
+Role-Gated Routing: Agar role 'Organizer' hai toh Student Dashboard ki jagah Organizer Dashboard khule.
+
+Job Creation Form: Nayi opportunities post karne ka UI.
+
+The Kanban Board: Tera highlight feature! Applicants ko drag-drop karne wala Trello-style board (Framer Motion use karke).
+
+Analytics UI: /api/analytics/organizer se data laakar charts dikhana.
+
+Phase 4: Sprint 3 – Profiles & Strict Auth
+Goal: User profiles complete karna aur leaks band karna.
+
+Profile Settings: Student apne LeetCode/Codeforces handles update kar sake (/api/users/profile/handles).
+
+Session Consistency: Token expiry handle karna (user ko auto-logout karna jab JWT expire ho).
+
+Phase 5: Sprint 4 & 5 – Pro-Level Hardening (DevOps & Security)
+Goal: Project ko production-ready aur secure banana.
+
+Security: Registration API me check lagana ki koi khud ko 'Admin' na bana le. Resume upload par file size limit lagana.
+
+CORS & Rate Limiting: APIs ko secure karna taaki koi spam na kare.
+
+Testing & CI: Basic testing setup aur GitHub Actions (optional, but great for resume).
+
+Phase 6: Sprint 6 – The Final Launch Cut
+Goal: Deployment aur presentation.
+
+Cleanup: Unused assets (React logo, Vite logo) aur placeholder code udana.
+
+Docs: Frontend aur Root README.md ko professional likhna.
+
+Deploy: Vercel (Frontend) aur Render (Backend) par deploy marna.

@@ -2,7 +2,8 @@ const express = require('express');
 const { 
     applyForOpportunity, 
     getApplicationsForOpportunity, 
-    updateApplicationStatus 
+    updateApplicationStatus,
+    getStudentApplications
 } = require('../controllers/applicationController');
 const { protect, authorizeRoles } = require('../middlewares/authMiddleware');
 
@@ -10,6 +11,9 @@ const router = express.Router();
 
 // Route for Students to apply
 router.post('/', protect, authorizeRoles('Student'), applyForOpportunity);
+
+// Route for Students to view their own applications
+router.get('/student', protect, authorizeRoles('Student'), getStudentApplications);
 
 // Routes for Organizers to manage Kanban board
 router.get('/opportunity/:opportunityId', protect, authorizeRoles('Organizer'), getApplicationsForOpportunity);

@@ -25,7 +25,7 @@ const sendOTPEmail = async (userEmail, otp) => {
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully: ' + info.response);
+        // console.log('Email sent successfully: ' + info.response);
         return true;
     } catch (error) {
         console.error("Nodemailer Error:", error);

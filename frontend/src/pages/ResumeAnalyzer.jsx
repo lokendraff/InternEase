@@ -1,9 +1,9 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Upload, FileText, CheckCircle2, AlertTriangle, ArrowLeft,
-  Sparkles, Target, TrendingUp, RotateCcw, Shield,
+  Sparkles, Target, TrendingUp, RotateCcw, Shield, Zap,
 } from 'lucide-react';
 import API from '../utils/axios';
 import toast from 'react-hot-toast';
@@ -123,6 +123,7 @@ export default function ResumeAnalyzer() {
   const [dragOver, setDragOver] = useState(false);
   const [results, setResults] = useState(null);
   const inputRef = useRef(null);
+  const navigate = useNavigate();
 
   const processFile = useCallback(async (f) => {
     if (!f) return;
@@ -148,6 +149,10 @@ export default function ResumeAnalyzer() {
   const handleDrop = (e) => { e.preventDefault(); setDragOver(false); processFile(e.dataTransfer.files[0]); };
   const handleInput = (e) => processFile(e.target.files[0]);
   const reset = () => { setState('upload'); setFile(null); setResults(null); if (inputRef.current) inputRef.current.value = ''; };
+
+  const goToMockInterview = () => {
+    navigate('/mock-interview', { state: { hasResumeContext: true } });
+  };
 
   return (
     <div className="min-h-screen bg-obsidian text-amber-50">
@@ -316,13 +321,24 @@ export default function ResumeAnalyzer() {
                 </motion.div>
               </div>
 
-              {/* Scan Another Button */}
-              <motion.div {...fadeUp(0.5)} className="flex justify-center mt-14">
+              {/* ── Action Buttons ── */}
+              <motion.div {...fadeUp(0.5)} className="flex flex-col sm:flex-row items-center justify-center gap-5 mt-14">
+                {/* Scan Another Resume */}
                 <motion.button onClick={reset} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                  className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-2xl text-base font-bold text-amber-50
+                    bg-white/[0.04] border border-white/[0.12] overflow-hidden
+                    hover:border-amber-500/40 hover:bg-white/[0.06] transition-all duration-300 active:scale-[0.97]">
+                  <span className="relative z-10 flex items-center gap-2">
+                    <RotateCcw size={18} /> Scan Another Resume
+                  </span>
+                </motion.button>
+
+                {/* Start AI Mock Interview — Prominent Gold CTA */}
+                <motion.button onClick={goToMockInterview} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-2xl text-base font-bold text-obsidian bg-gold overflow-hidden
                     glow-gold hover:glow-gold-intense transition-all duration-300 active:scale-[0.97]">
                   <span className="relative z-10 flex items-center gap-2">
-                    <RotateCcw size={18} /> Scan Another Resume
+                    <Zap size={18} /> Start AI Mock Interview
                   </span>
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent
                     translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700 ease-in-out" />

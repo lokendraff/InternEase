@@ -1,0 +1,119 @@
+Here’s a repository-wide gap analysis focused on completion tasks (especially frontend), based on static scan of code/docs.
+
+1) Current structure inventory (backend vs frontend)
+Monorepo-style split: root has backend/ + frontend/ only (/README.md, /backend, /frontend).
+Backend (Express + Mongo): routes/controllers/models/utilities are present and fairly broad (backend/server.js:27-34, backend/routes/*.js).
+Frontend (React + Vite): only student-facing pages plus landing/auth exist (frontend/src/App.jsx:24-31).
+Key mismatch in docs:
+
+Root README is backend-centric and outdated for this repo structure (README.md:50-53, README.md:58-84).
+Frontend README is still default Vite template (frontend/README.md:1-17).
+2) Unfinished features/TODO signals from code/docs
+Strong unfinished indicators
+Broken link/route: Login links to /forgot-password, but route/page doesn’t exist in router (frontend/src/pages/LoginPage.jsx:151-153, frontend/src/App.jsx:24-31).
+Leaderboard is placeholder data, not backend-driven (frontend/src/pages/Leaderboard.jsx:11-23).
+Landing footer uses placeholder anchors (href="#") (frontend/src/pages/LandingPage.jsx:143-145).
+Unused starter assets remain (frontend/src/assets/react.svg, frontend/src/assets/vite.svg, frontend/src/assets/hero.png; no usage found).
+No real TODO/FIXME comments in source; only old “FIX” remarks in backend comments (backend/controllers/opportunityController.js:56, :71).
+3) Implemented API vs frontend usage (missing screens/flows/integrations)
+Backend endpoints implemented
+From route files:
+
+Auth: register/login/verify OTP (backend/routes/authRoutes.js:6-8)
+User: leaderboard/profile/update handles (backend/routes/userRoutes.js:7,10-11)
+Opportunities: live/all/create/by-id (backend/routes/opportunityRoutes.js:13,16-17,20)
+Applications: apply/list-for-opportunity/update-status (backend/routes/applicationRoutes.js:12,15-16)
+Analytics: organizer dashboard (backend/routes/analyticsRoutes.js:8)
+Interviews: generate/evaluate (backend/routes/interviewRoutes.js:7-8)
+AI: analyze resume (backend/routes/aiRoutes.js:11)
+Frontend actually calls
+Only these APIs are used:
+
+/api/auth/register, /api/auth/login, /api/auth/verify-otp
+/api/users/profile
+/api/opportunities/live
+/api/interviews/generate, /api/interviews/:id/evaluate
+/api/ai/analyze-resume
+(frontend/src/pages/*.jsx calls at: Register 93,105; Login 94; Dashboard 220,225; MockInterview 63,86; ResumeAnalyzer 136)
+Missing frontend integrations/screens (major)
+No UI for /api/users/leaderboard (frontend uses fake leaderboard).
+No UI for /api/users/profile/handles (coding handles update missing).
+No UI for internal opportunities /api/opportunities, /api/opportunities/:id, /api/opportunities POST.
+No UI for application flow /api/applications (apply), nor organizer Kanban (GET /opportunity/:id, PATCH /:id/status).
+No UI for organizer analytics /api/analytics/organizer.
+No organizer/admin dashboards, despite role model support (backend/models/User.js:9-13).
+Flow breakages
+Mock interview requires applicationId, but frontend has no “apply/manage applications” flow to obtain one (frontend/src/pages/MockInterview.jsx:49-63).
+XP/badges integration bug: backend returns gamification.xp/badges (backend/models/User.js:20-23, backend/controllers/userController.js:25-31), but dashboard reads profile.xp/profile.badges (frontend/src/pages/StudentDashboard.jsx:234-235).
+4) Missing non-functional work
+CI/CD absent: no .github/workflows.
+Tests absent: no test files and no test scripts in package manifests (backend/package.json:6-9, frontend/package.json:6-11).
+Lint/build coverage incomplete:
+Backend has no lint/build/test scripts (backend/package.json:6-9).
+Frontend has lint/build only (frontend/package.json:6-11).
+Env/config hardening missing:
+No .env.example in backend/frontend.
+Frontend API base URL hardcoded to localhost (frontend/src/utils/axios.js:4), not environment-driven.
+Security gaps:
+Registration accepts client-provided role directly (backend/controllers/authController.js:11,24) and model allows Admin (backend/models/User.js:11) → potential self-assigned admin.
+Resume upload route is public and uses memory storage without limits (backend/routes/aiRoutes.js:8,11).
+CORS fully open (backend/server.js:24).
+Error/logging consistency: mostly console.log/error scattered; no centralized logger/error middleware (backend/server.js, controllers).
+Deployment artifacts missing: no Docker/prod config files discovered.
+5) Prioritized completion backlog (effort + dependencies)
+P0 (critical path)
+Frontend UI + API integration
+Build real application flow (student): opportunities → apply → application list/status
+Effort: Large (5–8 days)
+Depends on: existing endpoints (backend/routes/opportunityRoutes.js, backend/routes/applicationRoutes.js)
+Implement organizer portal: create opportunity, Kanban status updates, analytics
+Effort: Large (6–10 days)
+Depends on: role-aware auth state, organizer endpoints already available
+Fix profile data mapping bug (XP/badges)
+Effort: Small (0.5 day)
+Depends on: none (contract alignment only)
+Replace static leaderboard with /api/users/leaderboard
+Effort: Small (0.5–1 day)
+Depends on: none
+Auth/user flows
+Role-based routing and dashboards (Student vs Organizer vs Admin)
+Effort: Medium (2–3 days)
+Depends on: state management for user role
+Resolve broken forgot-password UX (add page + backend OR remove link)
+Effort: Medium (1–2 days)
+Depends on: decision on backend support
+P1 (important)
+Data model / contract alignment
+Define and document API response contracts used by frontend
+Effort: Medium (1–2 days)
+Depends on: finalized screen flows
+Add coding handles management UI for /api/users/profile/handles
+Effort: Small (1 day)
+Depends on: profile page expansion
+Non-functional quality
+Add automated tests (backend API + frontend component/integration smoke tests)
+Effort: Large (4–7 days)
+Depends on: stabilized core flows
+Set up CI (lint + build + tests for both apps)
+Effort: Medium (1–2 days)
+Depends on: test/lint scripts finalized
+P2 (hardening/release readiness)
+Security / operations
+Harden auth/security (prevent privileged role self-registration, restrict upload, CORS policy, rate limiting)
+Effort: Medium (2–4 days)
+Depends on: auth flow decisions
+Environment/deployment standardization (.env.example, env-based frontend API URL, container/deploy config)
+Effort: Medium (2–3 days)
+Depends on: target hosting platform
+Centralized error handling + structured logging
+Effort: Medium (1–2 days)
+Depends on: observability preference/tooling
+Docs refresh (correct setup, architecture, role flows, API mapping)
+Effort: Small-Medium (1–2 days)
+Depends on: implemented flows
+6) Broken builds, missing assets, placeholder code callouts
+Likely lint failure(s) in frontend due unused imports (e.g., useEffect in MockInterview) under strict no-unused-vars rule (frontend/src/pages/MockInterview.jsx:1, frontend/eslint.config.js:26).
+Broken navigation: /forgot-password link with no route (LoginPage.jsx:151-153, App.jsx:24-31).
+Placeholder/hardcoded UI: leaderboard data (Leaderboard.jsx:11-23), footer links # (LandingPage.jsx:143-145).
+Unused starter assets: react.svg, vite.svg, likely hero.png (no references found).
+Docs not production-ready: frontend README is boilerplate (frontend/README.md:1-17), root README setup is backend-only/outdated for current split (README.md:50-84).
