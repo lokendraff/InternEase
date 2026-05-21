@@ -13,7 +13,7 @@ const applicationRoutes = require('./routes/applicationRoutes');
 const userRoutes = require('./routes/userRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
-
+const aiRoutes = require('./routes/aiRoutes');
 
 // Connect to Database
 connectDB();
@@ -31,6 +31,8 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/interviews', interviewRoutes);
+app.use('/api/ai', aiRoutes);
+
 // Test Route
 app.get('/', (req, res) => {
     res.send('InternEase API is running...');

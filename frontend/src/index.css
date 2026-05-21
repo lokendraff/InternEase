@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════
+   InternEase — Cyber Gold Design System (Global)
+   ═══════════════════════════════════════════════════════════════ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #0A0A0A;
+  color: #FFFBEB;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #0A0A0A; }
+::-webkit-scrollbar-thumb { background: #6B7280; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #F59E0B; }
+
+/* ── Glassmorphism Utilities ── */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.glass-gold {
+  background: rgba(251, 191, 36, 0.08);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(251, 191, 36, 0.20);
+}
+
+/* ── Glow Effects ── */
+.glow-gold {
+  box-shadow: 0 0 15px rgba(251,191,36,0.35), 0 0 40px rgba(251,191,36,0.15), inset 0 0 15px rgba(251,191,36,0.04);
+}
+.glow-gold-intense {
+  box-shadow: 0 0 20px rgba(251,191,36,0.55), 0 0 60px rgba(251,191,36,0.25), 0 0 100px rgba(251,191,36,0.10);
+}
+.text-glow-gold {
+  text-shadow: 0 0 12px rgba(251,191,36,0.6), 0 0 35px rgba(251,191,36,0.25);
+}
+
+/* ── Gradient Text ── */
+.gradient-text-gold {
+  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 45%, #FDE68A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Keyframes ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-14px); }
+}
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.12; transform: scale(1); }
+  50%      { opacity: 0.22; transform: scale(1.06); }
+}
+.animate-float      { animation: float 7s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 6s ease-in-out infinite; }
